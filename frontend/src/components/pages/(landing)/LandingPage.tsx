@@ -18,7 +18,7 @@ export function LandingPage() {
         <track kind="captions" />
       </video>
       <div
-        className="absolute inset-0 bg-sky-200/50 pointer-events-none"
+        className="absolute inset-0 bg-sky-200 mix-blend-multiply pointer-events-none"
         aria-hidden="true"
       />
       <div className="relative z-10 flex flex-col min-h-screen">
