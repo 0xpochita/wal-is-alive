@@ -3,6 +3,7 @@
 import { ActionCard } from "./ActionCard";
 import { CreatureCard } from "./CreatureCard";
 import { DeathOverlay } from "./DeathOverlay";
+import { FeedToast } from "./FeedToast";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { HowItWorks } from "./HowItWorks";
@@ -61,6 +62,7 @@ export function MainPage() {
           onRevive={wal.revive}
         />
       )}
+      <FeedToast fedAt={wal.fedAt} />
     </div>
   );
 }

@@ -76,9 +76,14 @@ export function getMood(energy: number, status: WalStatus): Mood {
 
 export function formatCountdown(totalSeconds: number): string {
   const whole = Math.max(0, Math.floor(totalSeconds));
-  const minutes = Math.floor(whole / 60);
+  const hours = Math.floor(whole / 3600);
+  const minutes = Math.floor((whole % 3600) / 60);
   const seconds = whole % 60;
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  const ss = seconds.toString().padStart(2, "0");
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${ss}`;
+  }
+  return `${minutes}:${ss}`;
 }
 
 async function postState(url: string): Promise<StateResponse | null> {
@@ -93,6 +98,7 @@ export function useWalState() {
   const dyingRef = useRef(false);
   const [balance, setBalance] = useState<BalanceResponse | null>(null);
   const [renewing, setRenewing] = useState(false);
+  const [fedAt, setFedAt] = useState<number | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -144,7 +150,10 @@ export function useWalState() {
 
   const feed = async () => {
     const next = await postState("/api/feed");
-    if (next) setData(next);
+    if (next) {
+      setData(next);
+      setFedAt(Date.now());
+    }
   };
 
   const renew = async () => {
@@ -164,8 +173,8 @@ export function useWalState() {
     if (next) setData(next);
   };
 
-  const energy = data?.energy ?? 100;
-  const energyMax = data?.energyMax ?? 100;
+  const energy = data?.energy ?? 10000;
+  const energyMax = data?.energyMax ?? 10000;
   const status: WalStatus = data?.status ?? "alive";
 
   return {
@@ -184,6 +193,7 @@ export function useWalState() {
     mood: getMood(energy, status),
     loading: data === null,
     renewing,
+    fedAt,
     feed,
     renew,
     revive,

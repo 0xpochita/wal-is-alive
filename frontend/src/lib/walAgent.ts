@@ -6,7 +6,7 @@ import { deleteBody, extendBody, storeText } from "./walrus";
 const GENOME_EPOCHS = 5;
 const MEMORY_EPOCHS = 3;
 const RENEW_EPOCHS = 3;
-const FEED_AMOUNT = 18;
+const FEED_AMOUNT = 20;
 
 export async function birth(): Promise<StateResponse> {
   let triggered = false;
