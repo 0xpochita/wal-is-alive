@@ -23,7 +23,7 @@ export function DeathOverlay({ blobId, onRevive }: DeathOverlayProps) {
         <button
           type="button"
           onClick={onRevive}
-          className="mt-6 inline-flex items-center rounded-full border border-blue-400 px-5 py-2.5 text-[13px] font-medium text-blue-500 transition-all duration-200 hover:border-blue-500 hover:bg-blue-500 hover:text-white"
+          className="mt-6 inline-flex cursor-pointer items-center rounded-full border border-blue-400 px-5 py-2.5 text-[13px] font-medium text-blue-500 transition-all duration-200 hover:border-blue-500 hover:bg-blue-500 hover:text-white"
         >
           Revive (restart demo)
         </button>
