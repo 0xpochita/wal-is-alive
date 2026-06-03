@@ -71,3 +71,11 @@ export async function extendBody(
   });
   return digest;
 }
+
+export async function extendQuoteWal(epochs: number): Promise<number> {
+  // The body/memory blobs are tiny and all round up to Walrus's minimum
+  // storage unit, so any small representative size yields the real per-extend
+  // storage cost (verified: 100B and 10KB return the same cost).
+  const { storageCost } = await getWalrusClient().storageCost(1024, epochs);
+  return Number(storageCost) / 1e9;
+}

@@ -5,7 +5,10 @@ import {
   useSignAndExecuteTransaction,
 } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
+import { AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { useState } from "react";
+import { FeedConfirm } from "./FeedConfirm";
 import { SUI_NETWORK } from "./links";
 import { WalletButton } from "./WalletButton";
 
@@ -20,6 +23,7 @@ interface FeedButtonProps {
 export function FeedButton({ onFeed, disabled = false }: FeedButtonProps) {
   const account = useCurrentAccount();
   const { mutate, isPending } = useSignAndExecuteTransaction();
+  const [confirming, setConfirming] = useState(false);
 
   if (!account) {
     return <WalletButton fullWidth connectText="Connect wallet to feed" />;
@@ -37,20 +41,35 @@ export function FeedButton({ onFeed, disabled = false }: FeedButtonProps) {
 
   const busy = disabled || isPending;
   return (
-    <button
-      type="button"
-      onClick={feed}
-      disabled={busy}
-      className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-blue-500 px-6 py-3 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
-    >
-      <Image
-        src="/Images/logo-brands/sui-logo.jpg"
-        alt=""
-        width={18}
-        height={18}
-        className="h-[18px] w-[18px] rounded-full"
-      />
-      {busy ? "Feeding…" : "Feed the Wal · 0.00001 SUI"}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        disabled={busy}
+        className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-blue-500 px-6 py-3 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
+      >
+        <Image
+          src="/Images/logo-brands/sui-logo.jpg"
+          alt=""
+          width={18}
+          height={18}
+          className="h-[18px] w-[18px] rounded-full"
+        />
+        {busy ? "Feeding…" : "Feed the Wal · 0.00001 SUI"}
+      </button>
+      <AnimatePresence>
+        {confirming ? (
+          <FeedConfirm
+            key="feed-confirm"
+            amountSui={FEED_MIST / 1e9}
+            onConfirm={() => {
+              setConfirming(false);
+              feed();
+            }}
+            onCancel={() => setConfirming(false)}
+          />
+        ) : null}
+      </AnimatePresence>
+    </>
   );
 }
