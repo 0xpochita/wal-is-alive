@@ -1,19 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { LuActivity, LuNewspaper } from "react-icons/lu";
-import { type NewsItem, newsResponseSchema } from "@/lib/schemas";
+import { useCallback, useEffect, useState } from "react";
+import { LuActivity, LuDatabase, LuNewspaper } from "react-icons/lu";
+import {
+  type NewsItem,
+  newsResponseSchema,
+  type TokenInfo,
+  tokensResponseSchema,
+} from "@/lib/schemas";
 import { blobUrl, isRealBlobId, txUrl } from "./links";
 import type { Memory } from "./useWalState";
 
-type Tab = "memories" | "news" | "onchain";
+type Tab = "memories" | "news" | "onchain" | "tatum";
 type NewsKind = "ecosystem" | "onchain";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "memories", label: "Memories on Walrus" },
   { id: "news", label: "AI News" },
   { id: "onchain", label: "Onchain data" },
+  { id: "tatum", label: "Tatum API" },
 ];
 
 function BlobLine({ blobId }: { blobId: string }) {
@@ -160,6 +166,177 @@ function NewsFeed({ kind }: { kind: NewsKind }) {
   );
 }
 
+const TOKEN_KINDS = [
+  { id: "trending", label: "Trending" },
+  { id: "newest", label: "Newest" },
+  { id: "popular", label: "Popular" },
+];
+const TOKEN_CHAINS = [
+  { id: "ethereum-mainnet", label: "Ethereum" },
+  { id: "bsc-mainnet", label: "BNB" },
+  { id: "base-mainnet", label: "Base" },
+  { id: "solana-mainnet", label: "Solana" },
+];
+
+function formatPrice(value: number): string {
+  if (value <= 0) {
+    return "0";
+  }
+  if (value < 0.0001) {
+    return value.toExponential(2);
+  }
+  if (value < 1) {
+    return value.toPrecision(3);
+  }
+  return value.toLocaleString("en-US", { maximumFractionDigits: 2 });
+}
+
+function formatCompact(value: number): string {
+  return value.toLocaleString("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  });
+}
+
+function TatumApiTab() {
+  const [kind, setKind] = useState("trending");
+  const [chain, setChain] = useState("ethereum-mainnet");
+  const [tokens, setTokens] = useState<TokenInfo[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  const load = useCallback(async (nextKind: string, nextChain: string) => {
+    setTokens(null);
+    setFailed(false);
+    try {
+      const res = await fetch(
+        `/api/tatum-data?kind=${nextKind}&chain=${nextChain}`,
+      );
+      const parsed = tokensResponseSchema.safeParse(await res.json());
+      if (parsed.success) {
+        setTokens(parsed.data.tokens);
+      } else {
+        setFailed(true);
+      }
+    } catch {
+      setFailed(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    load("trending", "ethereum-mainnet");
+  }, [load]);
+
+  return (
+    <div>
+      <div className="flex gap-1.5">
+        {TOKEN_KINDS.map((entry) => (
+          <button
+            key={entry.id}
+            type="button"
+            onClick={() => {
+              setKind(entry.id);
+              load(entry.id, chain);
+            }}
+            className={`cursor-pointer rounded-full px-3 py-1 text-[12px] font-medium transition-colors ${
+              kind === entry.id
+                ? "bg-blue-100 text-blue-700"
+                : "border border-sky-100 text-gray-500 hover:bg-sky-50"
+            }`}
+          >
+            {entry.label}
+          </button>
+        ))}
+      </div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {TOKEN_CHAINS.map((entry) => (
+          <button
+            key={entry.id}
+            type="button"
+            onClick={() => {
+              setChain(entry.id);
+              load(kind, entry.id);
+            }}
+            className={`cursor-pointer rounded-full px-2.5 py-0.5 text-[11px] transition-colors ${
+              chain === entry.id
+                ? "bg-sky-100 text-sky-700"
+                : "text-gray-400 hover:bg-sky-50"
+            }`}
+          >
+            {entry.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-3">
+        {failed ? (
+          <p className="text-[13px] text-gray-400">
+            Couldn't load tokens right now.
+          </p>
+        ) : tokens === null ? (
+          <div className="flex items-center gap-2 text-[13px] text-gray-400">
+            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-sky-200 border-t-blue-500" />
+            Loading tokens via Tatum…
+          </div>
+        ) : tokens.length === 0 ? (
+          <p className="text-[13px] text-gray-400">
+            No tokens for this selection.
+          </p>
+        ) : (
+          <ul className="flex flex-col divide-y divide-sky-100">
+            {tokens.map((token) => (
+              <li
+                key={token.tokenAddress}
+                className="flex items-center gap-3 py-2.5"
+              >
+                {token.logo ? (
+                  // biome-ignore lint/performance/noImgElement: external token logos from the Tatum CDN (arbitrary hosts), not local assets
+                  <img
+                    src={token.logo}
+                    alt=""
+                    width={28}
+                    height={28}
+                    className="h-7 w-7 shrink-0 rounded-full bg-sky-50 object-cover"
+                  />
+                ) : (
+                  <span className="h-7 w-7 shrink-0 rounded-full bg-sky-100" />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-medium text-gray-900">
+                    {token.name}
+                  </p>
+                  <p className="text-[11px] text-gray-400">
+                    {token.symbol}
+                    {token.marketCap > 0
+                      ? ` · MC $${formatCompact(token.marketCap)}`
+                      : ""}
+                  </p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-[13px] font-medium text-gray-900 tabular-nums">
+                    ${formatPrice(token.usdPrice)}
+                  </p>
+                  <p
+                    className={`text-[11px] tabular-nums ${
+                      token.change24h >= 0 ? "text-emerald-600" : "text-red-600"
+                    }`}
+                  >
+                    {token.change24h >= 0 ? "+" : ""}
+                    {(token.change24h * 100).toFixed(1)}%
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <p className="mt-4 text-[11px] text-gray-400">
+        Live token data via the Tatum Data API (Token API).
+      </p>
+    </div>
+  );
+}
+
 function TabIcon({ id }: { id: Tab }) {
   if (id === "memories") {
     return (
@@ -177,8 +354,13 @@ function TabIcon({ id }: { id: Tab }) {
       <LuNewspaper aria-hidden="true" className="h-3.5 w-3.5 text-blue-500" />
     );
   }
+  if (id === "onchain") {
+    return (
+      <LuActivity aria-hidden="true" className="h-3.5 w-3.5 text-blue-500" />
+    );
+  }
   return (
-    <LuActivity aria-hidden="true" className="h-3.5 w-3.5 text-blue-500" />
+    <LuDatabase aria-hidden="true" className="h-3.5 w-3.5 text-blue-500" />
   );
 }
 
@@ -207,6 +389,7 @@ export function MemoryCard({ memories }: { memories: Memory[] }) {
         {tab === "memories" && <MemoriesTab memories={memories} />}
         {tab === "news" && <NewsFeed kind="ecosystem" />}
         {tab === "onchain" && <NewsFeed kind="onchain" />}
+        {tab === "tatum" && <TatumApiTab />}
       </div>
     </section>
   );

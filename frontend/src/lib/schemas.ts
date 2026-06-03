@@ -54,3 +54,20 @@ export const renewQuoteSchema = z.object({
 });
 
 export type RenewQuote = z.infer<typeof renewQuoteSchema>;
+
+export const tokenInfoSchema = z.object({
+  tokenAddress: z.string(),
+  name: z.string(),
+  symbol: z.string(),
+  logo: z.string().nullable(),
+  usdPrice: z.number(),
+  marketCap: z.number(),
+  change24h: z.number(),
+});
+
+export const tokensResponseSchema = z.object({
+  tokens: z.array(tokenInfoSchema),
+});
+
+export type TokenInfo = z.infer<typeof tokenInfoSchema>;
+export type TokensResponse = z.infer<typeof tokensResponseSchema>;
