@@ -17,6 +17,7 @@ export const stateResponseSchema = z.object({
   bodyBlobId: z.string().nullable(),
   bodyObjectId: z.string().nullable(),
   deathDigest: z.string().nullable(),
+  lastRenewDigest: z.string().nullable(),
   memories: z.array(memorySchema),
 });
 
@@ -32,3 +33,16 @@ export const balanceResponseSchema = z.object({
 });
 
 export type BalanceResponse = z.infer<typeof balanceResponseSchema>;
+
+export const newsItemSchema = z.object({
+  title: z.string(),
+  summary: z.string(),
+  source: z.string().optional(),
+});
+
+export const newsResponseSchema = z.object({
+  items: z.array(newsItemSchema),
+});
+
+export type NewsItem = z.infer<typeof newsItemSchema>;
+export type NewsResponse = z.infer<typeof newsResponseSchema>;

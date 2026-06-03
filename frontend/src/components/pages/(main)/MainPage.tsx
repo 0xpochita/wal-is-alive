@@ -3,6 +3,7 @@
 import { ActionCard } from "./ActionCard";
 import { CreatureCard } from "./CreatureCard";
 import { DeathOverlay } from "./DeathOverlay";
+import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { HowItWorks } from "./HowItWorks";
 import { MemoryCard } from "./MemoryCard";
@@ -39,6 +40,8 @@ export function MainPage() {
             mood={wal.mood}
             isDead={isDead}
             canRenew={wal.bodyStatus === "stored"}
+            renewing={wal.renewing}
+            lastRenewDigest={wal.lastRenewDigest}
             sui={wal.sui}
             wal={wal.wal}
             onFeed={wal.feed}
@@ -46,20 +49,11 @@ export function MainPage() {
           />
         </div>
         <div className="mt-5 grid gap-5 lg:grid-cols-3">
-          <MemoryCard
-            memories={wal.memories}
-            bodyBlobId={wal.bodyBlobId}
-            bodyObjectId={wal.bodyObjectId}
-            sui={wal.sui}
-            wal={wal.wal}
-            status={wal.status}
-            deathDigest={wal.deathDigest}
-            mood={wal.mood}
-            energy={wal.energy}
-          />
+          <MemoryCard memories={wal.memories} />
           <HowItWorks />
         </div>
       </main>
+      <Footer />
       {isEnding && (
         <DeathOverlay
           blobId={wal.bodyBlobId}

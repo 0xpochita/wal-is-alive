@@ -102,25 +102,23 @@ export async function renew(): Promise<StateResponse> {
     return getView();
   }
   const objectId = state.bodyObjectId;
-  void (async () => {
-    try {
-      await extendBody(objectId, RENEW_EPOCHS);
-      await update((s) => {
-        s.memories = [
-          {
-            id: `renew-${Date.now()}`,
-            text: `Paid WAL to extend storage (+${RENEW_EPOCHS} epochs).`,
-            blobId: "—",
-            at: Date.now(),
-          },
-          ...s.memories,
-        ];
-      });
-    } catch {
-      // extension failed; leave state unchanged
-    }
-  })();
-  return getView();
+  try {
+    const digest = await extendBody(objectId, RENEW_EPOCHS);
+    return await update((s) => {
+      s.lastRenewDigest = digest;
+      s.memories = [
+        {
+          id: `renew-${Date.now()}`,
+          text: `Paid WAL to extend storage (+${RENEW_EPOCHS} epochs).`,
+          blobId: "—",
+          at: Date.now(),
+        },
+        ...s.memories,
+      ];
+    });
+  } catch {
+    return getView();
+  }
 }
 
 export async function die(): Promise<StateResponse> {

@@ -9,7 +9,7 @@ import Image from "next/image";
 import { WalletButton } from "./WalletButton";
 
 const WAL_ADDRESS = process.env.NEXT_PUBLIC_WAL_ADDRESS ?? "";
-const FEED_MIST = 50_000_000;
+const FEED_MIST = 10_000;
 
 interface FeedButtonProps {
   onFeed: () => void;
@@ -49,7 +49,7 @@ export function FeedButton({ onFeed, disabled = false }: FeedButtonProps) {
         height={18}
         className="h-[18px] w-[18px] rounded-full"
       />
-      {busy ? "Feeding…" : "Feed the Wal · 0.05 SUI"}
+      {busy ? "Feeding…" : "Feed the Wal · 0.00001 SUI"}
     </button>
   );
 }

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { EnergyBar } from "./EnergyBar";
 import { FeedButton } from "./FeedButton";
-import { SUI_NETWORK } from "./links";
+import { SUI_NETWORK, txUrl } from "./links";
 import { formatCountdown, type Mood } from "./useWalState";
 
 interface ActionCardProps {
@@ -11,6 +11,8 @@ interface ActionCardProps {
   mood: Mood;
   isDead: boolean;
   canRenew: boolean;
+  renewing: boolean;
+  lastRenewDigest: string | null;
   sui: number;
   wal: number;
   onFeed: () => void;
@@ -52,6 +54,8 @@ export function ActionCard({
   mood,
   isDead,
   canRenew,
+  renewing,
+  lastRenewDigest,
   sui,
   wal,
   onFeed,
@@ -96,22 +100,37 @@ export function ActionCard({
         <button
           type="button"
           onClick={onRenew}
-          disabled={!canRenew}
+          disabled={!canRenew || renewing}
           className="mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-blue-300 px-6 py-2.5 text-[13px] font-medium text-blue-600 transition-colors duration-200 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
         >
-          <Image
-            src="/Images/logo-brands/walrus-logo.png"
-            alt=""
-            width={16}
-            height={16}
-            className="h-4 w-4 rounded-full"
-          />
-          Pay WAL to extend storage
+          {renewing ? (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-blue-200 border-t-blue-500" />
+          ) : (
+            <Image
+              src="/Images/logo-brands/walrus-logo.png"
+              alt=""
+              width={16}
+              height={16}
+              className="h-4 w-4 rounded-full"
+            />
+          )}
+          {renewing ? "Paying WAL on-chain…" : "Pay WAL to extend storage"}
         </button>
-        <p className="mt-2 text-[12px] leading-relaxed text-gray-400">
-          Feeding writes a new memory; renewing spends WAL to keep the body
-          alive.
-        </p>
+        {lastRenewDigest ? (
+          <a
+            href={txUrl(lastRenewDigest)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-2 inline-flex items-center gap-1 text-[12px] font-medium text-blue-500 hover:text-blue-600"
+          >
+            Storage renewed on-chain · view tx ↗
+          </a>
+        ) : (
+          <p className="mt-2 text-[12px] leading-relaxed text-gray-400">
+            Feeding writes a new memory; renewing spends WAL to keep the body
+            alive.
+          </p>
+        )}
       </div>
     </section>
   );

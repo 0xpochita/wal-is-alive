@@ -92,6 +92,7 @@ export function useWalState() {
   const bornRef = useRef(false);
   const dyingRef = useRef(false);
   const [balance, setBalance] = useState<BalanceResponse | null>(null);
+  const [renewing, setRenewing] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -147,8 +148,13 @@ export function useWalState() {
   };
 
   const renew = async () => {
-    const next = await postState("/api/renew");
-    if (next) setData(next);
+    setRenewing(true);
+    try {
+      const next = await postState("/api/renew");
+      if (next) setData(next);
+    } finally {
+      setRenewing(false);
+    }
   };
 
   const revive = async () => {
@@ -171,11 +177,13 @@ export function useWalState() {
     bodyBlobId: data?.bodyBlobId ?? null,
     bodyObjectId: data?.bodyObjectId ?? null,
     deathDigest: data?.deathDigest ?? null,
+    lastRenewDigest: data?.lastRenewDigest ?? null,
     memories: data?.memories ?? [],
     sui: balance?.sui ?? 0,
     wal: balance?.wal ?? 0,
     mood: getMood(energy, status),
     loading: data === null,
+    renewing,
     feed,
     renew,
     revive,

@@ -12,6 +12,7 @@ interface PersistedState {
   bodyBlobId: string | null;
   bodyObjectId: string | null;
   deathDigest: string | null;
+  lastRenewDigest: string | null;
   memories: Memory[];
   feedCount: number;
 }
@@ -28,6 +29,7 @@ function seed(): PersistedState {
     bodyBlobId: null,
     bodyObjectId: null,
     deathDigest: null,
+    lastRenewDigest: null,
     memories: [],
     feedCount: 0,
   };
@@ -72,6 +74,7 @@ function toView(state: PersistedState): StateResponse {
     bodyBlobId: state.bodyBlobId,
     bodyObjectId: state.bodyObjectId,
     deathDigest: state.deathDigest,
+    lastRenewDigest: state.lastRenewDigest,
     memories: state.memories,
   };
 }
