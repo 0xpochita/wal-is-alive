@@ -48,7 +48,12 @@ function loadRaw(): PersistedState {
     persist(fresh);
     return fresh;
   }
-  return JSON.parse(readFileSync(STATE_FILE, "utf-8")) as PersistedState;
+  const loaded = JSON.parse(
+    readFileSync(STATE_FILE, "utf-8"),
+  ) as Partial<PersistedState>;
+  // Merge over a fresh seed so a file written by older code (missing newer
+  // fields) still satisfies the response schema instead of failing to parse.
+  return { ...seed(), ...loaded };
 }
 
 function withDecay(state: PersistedState): PersistedState {
