@@ -9,12 +9,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/0xpochita/wal-is-alive"><strong>📦 Repository</strong></a> · Built on <strong>Sui Mainnet</strong> with <strong>Walrus</strong> + <strong>Tatum</strong>
+  <a href="https://wal-is-alive.vercel.app"><strong>🌐 Live Demo</strong></a> · <a href="https://github.com/0xpochita/wal-is-alive"><strong>📦 Repository</strong></a> · Built on <strong>Sui Mainnet</strong> with <strong>Walrus</strong> + <strong>Tatum</strong>
 </p>
 
 ---
 
 Wal is Alive is a **living dashboard for a self-funding digital organism** built on **Sui Mainnet + Walrus + Tatum**. The Wal's genome and every memory are written as real blobs on **Walrus**; Walrus storage is *rented per epoch and paid in WAL*, so the cost of staying stored is literally the creature's metabolism. Users **feed** it SUI from their wallet to refill energy and write a fresh memory; the Wal **pays WAL** to extend its blob's storage on-chain; and when its energy reaches zero it **deletes its own body blob** — emitting a `BlobDeleted` event that anyone can verify. All on-chain access to Sui flows through **Tatum** (RPC gateway for balances, Data API for token discovery, MCP config for AI tooling).
+
+In plain terms: **Wal is Alive turns AI on-chain news into a public good.** Instead of everyone buying their own AI subscription to read on-chain news, one shared agent publishes AI on-chain news about Sui & Walrus for *everyone* — and the community keeps it alive simply by feeding it. As long as the Wal is fed, the news keeps coming; the moment it goes unfed, it dies and the news stops, provably on-chain.
 
 > **The body literally *is* Walrus blobs; the storage cost *is* the metabolism. Remove Walrus and there is no Wal.**
 >
@@ -34,12 +36,13 @@ Wal is Alive is the most tangible possible answer to that question, built for ha
 
 ### The Problem
 
-Two real Web3 problems, fused into one demonstration:
+Three real Web3 problems, fused into one demonstration:
 
 - **Problem A — decentralized storage is rented, not eternal.** Many assume that once data lands in Web3 storage it is safe forever. It is not. On Walrus, storage is leased per *epoch* and must keep being paid in WAL. When the lease lapses and is not renewed, the blob becomes unavailable. This is exactly why so many NFTs have "dead images." Nobody has cleanly answered *who keeps the data alive on its own*.
 - **Problem B — AI agents cannot fund their own existence.** A long-running agent needs memory, storage, and compute, and so far there is always a human paying the bill. When the human stops, the agent dies silently. There is no clean model where the agent **earns enough itself** to keep its memory alive.
+- **Problem C — AI on-chain news is paywalled, one subscription per person.** Reading AI-written news about on-chain activity means everyone buys and pays for their *own* AI subscription — so it stays gated, and not everyone can access it. There is no shared, always-on agent that publishes that news as a public good for the whole community.
 
-> **The Wal's answer:** an entity that funds its own memory storage out of what it earns. As long as it can earn, its memory lives; the moment it goes bankrupt, its memory is deleted — permanently, provably, without a bailout. The pay-or-perish mechanism is a **reusable pattern** for any Web3 data that needs to outlive its creator.
+> **The Wal's answer:** one shared AI agent that publishes **AI on-chain news about Sui & Walrus for everyone**, funded not by individual subscriptions but by the community that feeds it. As long as it can earn, it stays alive and keeps publishing; the moment it goes bankrupt, its memory is deleted — permanently, provably, without a bailout. Nobody needs their own subscription — feed the one Wal, and the news stays alive for all. The pay-or-perish mechanism is a **reusable pattern** for any Web3 data that needs to outlive its creator.
 
 ### The Solution
 
@@ -300,6 +303,7 @@ Wal is Alive ships **no custom Move contracts** — the on-chain lifecycle (regi
 | **Walrus** | Body + memories as real blobs; pay-WAL renewal + `BlobDeleted` self-delete |
 | **Tatum** | Sui RPC gateway (balances) + Data API (Token API) + MCP (`@tatumio/blockchain-mcp`) |
 | **Bonus pools** | Best Walrus Integration · Best Use of Tatum Tools |
+| **Live Demo** | [wal-is-alive.vercel.app](https://wal-is-alive.vercel.app) |
 | **Repository** | [github.com/0xpochita/wal-is-alive](https://github.com/0xpochita/wal-is-alive) |
 
 ---
