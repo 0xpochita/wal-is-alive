@@ -46,7 +46,17 @@ export function MainPage() {
           />
         </div>
         <div className="mt-5 grid gap-5 lg:grid-cols-3">
-          <MemoryCard memories={wal.memories} />
+          <MemoryCard
+            memories={wal.memories}
+            bodyBlobId={wal.bodyBlobId}
+            bodyObjectId={wal.bodyObjectId}
+            sui={wal.sui}
+            wal={wal.wal}
+            status={wal.status}
+            deathDigest={wal.deathDigest}
+            mood={wal.mood}
+            energy={wal.energy}
+          />
           <HowItWorks />
         </div>
       </main>

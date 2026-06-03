@@ -169,6 +169,7 @@ export function useWalState() {
     secondsLeft: data?.secondsLeft ?? 0,
     bodyStatus: data?.bodyStatus ?? "unborn",
     bodyBlobId: data?.bodyBlobId ?? null,
+    bodyObjectId: data?.bodyObjectId ?? null,
     deathDigest: data?.deathDigest ?? null,
     memories: data?.memories ?? [],
     sui: balance?.sui ?? 0,
