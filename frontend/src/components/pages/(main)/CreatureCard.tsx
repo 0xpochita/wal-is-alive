@@ -14,7 +14,7 @@ const BACKGROUND_VIDEO_URL =
 const BODY_LABEL: Record<BodyStatus, string> = {
   unborn: "Waking…",
   writing: "Materializing on Walrus…",
-  stored: "Body · live on Walrus",
+  stored: "Live on Walrus",
   deleting: "Deleting body…",
   deleted: "Body deleted",
 };

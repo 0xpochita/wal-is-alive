@@ -25,8 +25,8 @@ export function Header({ mood, status }: HeaderProps) {
               priority
             />
           </span>
-          <span className="text-[15px] font-semibold tracking-tight text-gray-900">
-            Wal
+          <span className="whitespace-nowrap text-[15px] font-semibold tracking-tight text-gray-900">
+            Wal is Alive
           </span>
         </Link>
         <div className="flex items-center gap-3">

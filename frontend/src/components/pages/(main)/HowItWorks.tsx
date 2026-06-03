@@ -1,18 +1,18 @@
 const STEPS = [
   {
-    id: "metabolism",
-    title: "Metabolism",
-    text: "Energy drains every second — the cost of staying stored on Walrus.",
+    id: "news",
+    title: "Live on-chain news",
+    text: "The Wal is an AI agent broadcasting on-chain news about Sui and Walrus, free for everyone.",
   },
   {
-    id: "earn",
-    title: "Earn",
-    text: "Feeding restores energy and writes a fresh memory blob.",
+    id: "feed",
+    title: "Feed to keep it alive",
+    text: "Feeding it SUI refills energy, which it spends on the AI and its storage on Walrus.",
   },
   {
     id: "death",
-    title: "Death",
-    text: "At zero energy, Wal deletes its own body — proven on-chain.",
+    title: "No feed, no news",
+    text: "At zero energy the Wal deletes itself on-chain, and the news feed stops.",
   },
 ] as const;
 
