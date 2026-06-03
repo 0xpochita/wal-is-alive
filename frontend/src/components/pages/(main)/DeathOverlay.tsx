@@ -1,9 +1,16 @@
+import { txUrl } from "./links";
+
 interface DeathOverlayProps {
-  blobId: string;
+  blobId: string | null;
+  deathDigest: string | null;
   onRevive: () => void;
 }
 
-export function DeathOverlay({ blobId, onRevive }: DeathOverlayProps) {
+export function DeathOverlay({
+  blobId,
+  deathDigest,
+  onRevive,
+}: DeathOverlayProps) {
   return (
     <div className="absolute inset-0 z-20 flex items-center justify-center bg-sky-100/70 px-6 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-2xl border border-white/60 bg-white/80 p-8 text-center shadow-lg backdrop-blur-md">
@@ -18,8 +25,22 @@ export function DeathOverlay({ blobId, onRevive }: DeathOverlayProps) {
           death is proven on Sui.
         </p>
         <p className="mt-4 truncate font-mono text-[12px] text-gray-400 line-through">
-          {blobId}
+          {blobId ?? "—"}
         </p>
+        {deathDigest ? (
+          <a
+            href={txUrl(deathDigest)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 block truncate font-mono text-[12px] text-blue-500 hover:text-blue-600"
+          >
+            view BlobDeleted tx ↗
+          </a>
+        ) : (
+          <p className="mt-1 text-[12px] text-gray-400">
+            deleting body on-chain…
+          </p>
+        )}
         <button
           type="button"
           onClick={onRevive}

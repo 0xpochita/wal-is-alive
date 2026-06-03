@@ -12,6 +12,7 @@ import { useWalState } from "./useWalState";
 export function MainPage() {
   const wal = useWalState();
   const isDead = wal.status === "dead";
+  const isEnding = wal.status === "dead" || wal.status === "dying";
 
   return (
     <div className="min-h-screen bg-sky-50 text-gray-900">
@@ -26,14 +27,20 @@ export function MainPage() {
           isDead={isDead}
         />
         <div className="mt-5 grid gap-5 lg:grid-cols-3">
-          <CreatureCard bodyBlobId={wal.bodyBlobId} isDead={isDead} />
+          <CreatureCard
+            bodyStatus={wal.bodyStatus}
+            bodyBlobId={wal.bodyBlobId}
+            isDead={isDead}
+          />
           <ActionCard
             energy={wal.energy}
             energyMax={wal.energyMax}
             secondsLeft={wal.secondsLeft}
             mood={wal.mood}
             isDead={isDead}
+            canRenew={wal.bodyStatus === "stored"}
             onFeed={wal.feed}
+            onRenew={wal.renew}
           />
         </div>
         <div className="mt-5 grid gap-5 lg:grid-cols-3">
@@ -41,7 +48,13 @@ export function MainPage() {
           <HowItWorks />
         </div>
       </main>
-      {isDead && <DeathOverlay blobId={wal.bodyBlobId} onRevive={wal.revive} />}
+      {isEnding && (
+        <DeathOverlay
+          blobId={wal.bodyBlobId}
+          deathDigest={wal.deathDigest}
+          onRevive={wal.revive}
+        />
+      )}
     </div>
   );
 }

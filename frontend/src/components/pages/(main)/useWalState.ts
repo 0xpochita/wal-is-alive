@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   type Memory,
   type StateResponse,
@@ -6,7 +6,8 @@ import {
 } from "@/lib/schemas";
 
 export type { Memory };
-export type WalStatus = "alive" | "dead";
+export type WalStatus = StateResponse["status"];
+export type BodyStatus = StateResponse["bodyStatus"];
 export type MoodKey =
   | "comfortable"
   | "cautious"
@@ -63,7 +64,8 @@ const MOODS: Record<MoodKey, Mood> = {
 const POLL_MS = 1500;
 
 export function getMood(energy: number, status: WalStatus): Mood {
-  if (status === "dead" || energy <= 0) return MOODS.dead;
+  if (status === "dead") return MOODS.dead;
+  if (status === "dying" || energy <= 0) return MOODS.critical;
   if (energy > 50) return MOODS.comfortable;
   if (energy > 20) return MOODS.cautious;
   if (energy > 10) return MOODS.anxious;
@@ -85,13 +87,30 @@ async function postState(url: string): Promise<StateResponse | null> {
 
 export function useWalState() {
   const [data, setData] = useState<StateResponse | null>(null);
+  const bornRef = useRef(false);
+  const dyingRef = useRef(false);
 
   useEffect(() => {
     let active = true;
+    const set = (next: StateResponse | null) => {
+      if (active && next) setData(next);
+    };
     const refresh = async () => {
       const res = await fetch("/api/state", { cache: "no-store" });
       const parsed = stateResponseSchema.safeParse(await res.json());
-      if (active && parsed.success) setData(parsed.data);
+      if (!parsed.success) return;
+      set(parsed.data);
+      if (!bornRef.current && parsed.data.bodyStatus === "unborn") {
+        bornRef.current = true;
+        set(await postState("/api/birth"));
+      } else if (
+        !dyingRef.current &&
+        parsed.data.status === "alive" &&
+        parsed.data.energy <= 0
+      ) {
+        dyingRef.current = true;
+        set(await postState("/api/die"));
+      }
     };
     refresh();
     const timer = setInterval(refresh, POLL_MS);
@@ -106,7 +125,14 @@ export function useWalState() {
     if (next) setData(next);
   };
 
+  const renew = async () => {
+    const next = await postState("/api/renew");
+    if (next) setData(next);
+  };
+
   const revive = async () => {
+    bornRef.current = false;
+    dyingRef.current = false;
     const next = await postState("/api/revive");
     if (next) setData(next);
   };
@@ -120,11 +146,14 @@ export function useWalState() {
     energyMax,
     status,
     secondsLeft: data?.secondsLeft ?? 0,
-    bodyBlobId: data?.bodyBlobId ?? "—",
+    bodyStatus: data?.bodyStatus ?? "unborn",
+    bodyBlobId: data?.bodyBlobId ?? null,
+    deathDigest: data?.deathDigest ?? null,
     memories: data?.memories ?? [],
     mood: getMood(energy, status),
     loading: data === null,
     feed,
+    renew,
     revive,
   };
 }

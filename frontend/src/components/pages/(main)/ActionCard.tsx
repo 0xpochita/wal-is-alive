@@ -8,7 +8,9 @@ interface ActionCardProps {
   secondsLeft: number;
   mood: Mood;
   isDead: boolean;
+  canRenew: boolean;
   onFeed: () => void;
+  onRenew: () => void;
 }
 
 export function ActionCard({
@@ -17,7 +19,9 @@ export function ActionCard({
   secondsLeft,
   mood,
   isDead,
+  canRenew,
   onFeed,
+  onRenew,
 }: ActionCardProps) {
   return (
     <section className="flex flex-col rounded-2xl border border-sky-100 bg-white p-5 lg:col-span-1">
@@ -38,8 +42,17 @@ export function ActionCard({
       </p>
       <div className="mt-auto pt-6">
         <FeedButton onFeed={onFeed} disabled={isDead} />
+        <button
+          type="button"
+          onClick={onRenew}
+          disabled={!canRenew}
+          className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-full border border-blue-300 px-6 py-2.5 text-[13px] font-medium text-blue-600 transition-colors duration-200 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+        >
+          Pay WAL to extend storage
+        </button>
         <p className="mt-2 text-[12px] leading-relaxed text-gray-400">
-          Feeding restores energy and writes a new memory to Walrus.
+          Feeding writes a new memory; renewing spends WAL to keep the body
+          alive.
         </p>
       </div>
     </section>
