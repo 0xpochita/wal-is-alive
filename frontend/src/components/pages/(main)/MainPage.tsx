@@ -39,6 +39,8 @@ export function MainPage() {
             mood={wal.mood}
             isDead={isDead}
             canRenew={wal.bodyStatus === "stored"}
+            sui={wal.sui}
+            wal={wal.wal}
             onFeed={wal.feed}
             onRenew={wal.renew}
           />

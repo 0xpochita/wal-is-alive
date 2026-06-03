@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  type BalanceResponse,
+  balanceResponseSchema,
   type Memory,
   type StateResponse,
   stateResponseSchema,
@@ -89,6 +91,7 @@ export function useWalState() {
   const [data, setData] = useState<StateResponse | null>(null);
   const bornRef = useRef(false);
   const dyingRef = useRef(false);
+  const [balance, setBalance] = useState<BalanceResponse | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -114,6 +117,24 @@ export function useWalState() {
     };
     refresh();
     const timer = setInterval(refresh, POLL_MS);
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const refresh = async () => {
+      const res = await fetch("/api/balance", { cache: "no-store" }).catch(
+        () => null,
+      );
+      if (!res || !res.ok) return;
+      const parsed = balanceResponseSchema.safeParse(await res.json());
+      if (active && parsed.success) setBalance(parsed.data);
+    };
+    refresh();
+    const timer = setInterval(refresh, 15000);
     return () => {
       active = false;
       clearInterval(timer);
@@ -150,6 +171,8 @@ export function useWalState() {
     bodyBlobId: data?.bodyBlobId ?? null,
     deathDigest: data?.deathDigest ?? null,
     memories: data?.memories ?? [],
+    sui: balance?.sui ?? 0,
+    wal: balance?.wal ?? 0,
     mood: getMood(energy, status),
     loading: data === null,
     feed,

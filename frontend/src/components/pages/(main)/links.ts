@@ -1,3 +1,7 @@
+export const SUI_NETWORK = (
+  process.env.NEXT_PUBLIC_SUI_NETWORK ?? "testnet"
+).toLowerCase();
+
 const WALRUS_AGGREGATOR = "https://aggregator.walrus-testnet.walrus.space";
 const BLOB_SENTINELS = ["writing", "failed", "deleted", "pending", "—"];
 
@@ -10,5 +14,5 @@ export function blobUrl(blobId: string): string {
 }
 
 export function txUrl(digest: string): string {
-  return `https://suiscan.xyz/testnet/tx/${digest}`;
+  return `https://suiscan.xyz/${SUI_NETWORK}/tx/${digest}`;
 }

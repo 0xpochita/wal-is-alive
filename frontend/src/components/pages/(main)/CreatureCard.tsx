@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { blobUrl, isRealBlobId } from "./links";
 import type { BodyStatus } from "./useWalState";
 
@@ -42,8 +43,12 @@ export function CreatureCard({
           aria-hidden="true"
         />
         <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-[12px] font-medium text-gray-700 backdrop-blur">
-          <span
-            className={`h-2 w-2 rounded-full ${dim ? "bg-gray-400" : "bg-emerald-500 animate-pulse motion-reduce:animate-none"}`}
+          <Image
+            src="/Images/logo-brands/walrus-logo.png"
+            alt="Walrus"
+            width={16}
+            height={16}
+            className={`h-4 w-4 rounded-full ${dim ? "opacity-40 grayscale" : "animate-pulse motion-reduce:animate-none"}`}
           />
           {BODY_LABEL[bodyStatus]}
         </span>
