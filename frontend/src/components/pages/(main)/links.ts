@@ -2,7 +2,10 @@ export const SUI_NETWORK = (
   process.env.NEXT_PUBLIC_SUI_NETWORK ?? "testnet"
 ).toLowerCase();
 
-const WALRUS_AGGREGATOR = "https://aggregator.walrus-testnet.walrus.space";
+const WALRUS_AGGREGATOR =
+  SUI_NETWORK === "mainnet"
+    ? "https://aggregator.walrus-mainnet.walrus.space"
+    : "https://aggregator.walrus-testnet.walrus.space";
 const BLOB_SENTINELS = ["writing", "failed", "deleted", "pending", "—"];
 
 export function isRealBlobId(blobId: string): boolean {

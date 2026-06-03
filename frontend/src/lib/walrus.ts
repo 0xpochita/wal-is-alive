@@ -9,7 +9,9 @@ function getWalrusClient(): WalrusClient {
     suiClient: getFullnodeClient(),
     uploadRelay: {
       host: serverEnv.walrusUploadRelayUrl(),
-      sendTip: { max: 1_000_000 },
+      // Mainnet relay tips run higher than testnet (~2.6M MIST for a small
+      // blob); cap generously so writes aren't rejected.
+      sendTip: { max: 10_000_000 },
     },
   });
 }

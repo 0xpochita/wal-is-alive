@@ -6,6 +6,7 @@ import {
 } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
 import Image from "next/image";
+import { SUI_NETWORK } from "./links";
 import { WalletButton } from "./WalletButton";
 
 const WAL_ADDRESS = process.env.NEXT_PUBLIC_WAL_ADDRESS ?? "";
@@ -29,7 +30,7 @@ export function FeedButton({ onFeed, disabled = false }: FeedButtonProps) {
     const [coin] = tx.splitCoins(tx.gas, [FEED_MIST]);
     tx.transferObjects([coin], WAL_ADDRESS);
     mutate(
-      { transaction: tx, chain: "sui:testnet" },
+      { transaction: tx, chain: `sui:${SUI_NETWORK}` },
       { onSuccess: () => onFeed() },
     );
   };
