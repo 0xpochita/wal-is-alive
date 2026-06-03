@@ -73,6 +73,9 @@ async function callModel(
     },
     body: JSON.stringify({
       model,
+      // Cap output tokens — the news is tiny, and the model default (16384)
+      // 402s on a low OpenRouter balance ("can only afford N tokens").
+      max_tokens: 1000,
       response_format: { type: "json_object" },
       messages: [
         {
