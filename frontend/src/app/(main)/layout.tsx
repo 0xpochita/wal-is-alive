@@ -1,5 +1,6 @@
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
+import { Providers } from "./providers";
 
 const openRunde = localFont({
   src: [
@@ -30,5 +31,9 @@ const openRunde = localFont({
 });
 
 export default function MainLayout({ children }: { children: ReactNode }) {
-  return <div className={openRunde.className}>{children}</div>;
+  return (
+    <div className={openRunde.className}>
+      <Providers>{children}</Providers>
+    </div>
+  );
 }

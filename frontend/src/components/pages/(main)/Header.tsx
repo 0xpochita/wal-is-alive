@@ -1,3 +1,4 @@
+import { ConnectButton } from "@mysten/dapp-kit";
 import Image from "next/image";
 import Link from "next/link";
 import type { Mood, WalStatus } from "./useWalState";
@@ -35,10 +36,11 @@ export function Header({ mood, status }: HeaderProps) {
           </span>
           <Link
             href="/"
-            className="text-[13px] font-medium text-gray-500 transition-colors hover:text-gray-900"
+            className="hidden text-[13px] font-medium text-gray-500 transition-colors hover:text-gray-900 sm:block"
           >
             Home
           </Link>
+          <ConnectButton />
         </div>
       </div>
     </header>
