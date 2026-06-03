@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getView } from "@/lib/state";
+import { die } from "@/lib/walAgent";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export function GET() {
-  return NextResponse.json(getView());
+export async function POST() {
+  return NextResponse.json(await die());
 }
