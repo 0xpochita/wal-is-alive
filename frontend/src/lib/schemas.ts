@@ -24,3 +24,11 @@ export type Memory = z.infer<typeof memorySchema>;
 export type StateResponse = z.infer<typeof stateResponseSchema>;
 export type WalStatus = StateResponse["status"];
 export type BodyStatus = StateResponse["bodyStatus"];
+
+export const balanceResponseSchema = z.object({
+  sui: z.number(),
+  wal: z.number(),
+  address: z.string(),
+});
+
+export type BalanceResponse = z.infer<typeof balanceResponseSchema>;
