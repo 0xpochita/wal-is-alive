@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { LuActivity, LuNewspaper } from "react-icons/lu";
 import { type NewsItem, newsResponseSchema } from "@/lib/schemas";
-import { blobUrl, isRealBlobId } from "./links";
+import { blobUrl, isRealBlobId, txUrl } from "./links";
 import type { Memory } from "./useWalState";
 
 type Tab = "memories" | "news" | "onchain";
@@ -37,6 +37,22 @@ function BlobLine({ blobId }: { blobId: string }) {
   );
 }
 
+function TxLine({ digest }: { digest: string }) {
+  return (
+    <div className="mt-0.5 flex items-center gap-2 text-[11px]">
+      <span className="truncate font-mono text-gray-400">{digest}</span>
+      <a
+        href={txUrl(digest)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="shrink-0 whitespace-nowrap font-medium text-blue-500 hover:text-blue-600"
+      >
+        view tx ↗
+      </a>
+    </div>
+  );
+}
+
 function MemoriesTab({ memories }: { memories: Memory[] }) {
   if (memories.length === 0) {
     return (
@@ -55,7 +71,11 @@ function MemoriesTab({ memories }: { memories: Memory[] }) {
           <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
           <div className="min-w-0">
             <p className="text-[13px] text-gray-800">{memory.text}</p>
-            <BlobLine blobId={memory.blobId} />
+            {memory.txDigest ? (
+              <TxLine digest={memory.txDigest} />
+            ) : (
+              <BlobLine blobId={memory.blobId} />
+            )}
           </div>
         </li>
       ))}

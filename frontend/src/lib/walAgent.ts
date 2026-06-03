@@ -5,7 +5,7 @@ import { deleteBody, extendBody, storeText } from "./walrus";
 
 const GENOME_EPOCHS = 5;
 const MEMORY_EPOCHS = 3;
-const RENEW_EPOCHS = 3;
+export const RENEW_EPOCHS = 3;
 const FEED_AMOUNT = 20;
 
 export async function birth(): Promise<StateResponse> {
@@ -111,6 +111,7 @@ export async function renew(): Promise<StateResponse> {
           id: `renew-${Date.now()}`,
           text: `Paid WAL to extend storage (+${RENEW_EPOCHS} epochs).`,
           blobId: "—",
+          txDigest: digest,
           at: Date.now(),
         },
         ...s.memories,

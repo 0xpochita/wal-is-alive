@@ -5,6 +5,7 @@ export const memorySchema = z.object({
   text: z.string(),
   blobId: z.string(),
   objectId: z.string().nullable().optional(),
+  txDigest: z.string().nullable().optional(),
   at: z.number(),
 });
 
@@ -46,3 +47,10 @@ export const newsResponseSchema = z.object({
 
 export type NewsItem = z.infer<typeof newsItemSchema>;
 export type NewsResponse = z.infer<typeof newsResponseSchema>;
+
+export const renewQuoteSchema = z.object({
+  wal: z.number().nullable(),
+  epochs: z.number(),
+});
+
+export type RenewQuote = z.infer<typeof renewQuoteSchema>;
