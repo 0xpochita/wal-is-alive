@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+import {
+  type Memory,
+  type StateResponse,
+  stateResponseSchema,
+} from "@/lib/schemas";
 
-const ENERGY_MAX = 100;
-const BURN_PER_SECOND = 0.4;
-const FEED_AMOUNT = 18;
-const TICK_MS = 250;
-
+export type { Memory };
 export type WalStatus = "alive" | "dead";
 export type MoodKey =
   | "comfortable"
@@ -19,19 +20,6 @@ export interface Mood {
   text: string;
   bar: string;
   dot: string;
-}
-
-export interface Memory {
-  id: string;
-  text: string;
-  blobId: string;
-}
-
-interface WalState {
-  energy: number;
-  status: WalStatus;
-  memories: Memory[];
-  feedCount: number;
 }
 
 const MOODS: Record<MoodKey, Mood> = {
@@ -72,20 +60,7 @@ const MOODS: Record<MoodKey, Mood> = {
   },
 };
 
-const BODY_BLOB_ID = "Cmh2LQEGJwBYfmIC8duzK8FUE2UipCCrshAYjiUheZM";
-
-const SEED_MEMORIES: Memory[] = [
-  {
-    id: "genome",
-    text: "Genome sealed — traits and art style minted.",
-    blobId: BODY_BLOB_ID,
-  },
-  {
-    id: "birth",
-    text: "First breath. Body stored on Walrus.",
-    blobId: "B7nQ9xKp3vR2tLmW8sZcF4dH1jY6uN0aE5gTbXoPq2k",
-  },
-];
+const POLL_MS = 1500;
 
 export function getMood(energy: number, status: WalStatus): Mood {
   if (status === "dead" || energy <= 0) return MOODS.dead;
@@ -102,79 +77,53 @@ export function formatCountdown(totalSeconds: number): string {
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
-function makeBlobId(seed: number): string {
-  const chunk = (seed * 2654435761).toString(36).replace(/[^a-z0-9]/g, "");
-  return `${chunk}${chunk}${chunk}`.slice(0, 44);
-}
-
-function initialState(): WalState {
-  return {
-    energy: ENERGY_MAX,
-    status: "alive",
-    memories: SEED_MEMORIES,
-    feedCount: 0,
-  };
+async function postState(url: string): Promise<StateResponse | null> {
+  const res = await fetch(url, { method: "POST" });
+  const parsed = stateResponseSchema.safeParse(await res.json());
+  return parsed.success ? parsed.data : null;
 }
 
 export function useWalState() {
-  const [state, setState] = useState<WalState>(initialState);
+  const [data, setData] = useState<StateResponse | null>(null);
 
   useEffect(() => {
-    if (state.status === "dead") return;
-    const timer = setInterval(() => {
-      setState((current) => {
-        if (current.status === "dead") return current;
-        const next = current.energy - BURN_PER_SECOND * (TICK_MS / 1000);
-        if (next <= 0) {
-          const death: Memory = {
-            id: "death",
-            text: "Energy reached zero. Body blob deleted from Walrus.",
-            blobId: BODY_BLOB_ID,
-          };
-          return {
-            ...current,
-            energy: 0,
-            status: "dead",
-            memories: [death, ...current.memories],
-          };
-        }
-        return { ...current, energy: next };
-      });
-    }, TICK_MS);
-    return () => clearInterval(timer);
-  }, [state.status]);
+    let active = true;
+    const refresh = async () => {
+      const res = await fetch("/api/state", { cache: "no-store" });
+      const parsed = stateResponseSchema.safeParse(await res.json());
+      if (active && parsed.success) setData(parsed.data);
+    };
+    refresh();
+    const timer = setInterval(refresh, POLL_MS);
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
+  }, []);
 
-  function feed() {
-    setState((current) => {
-      if (current.status === "dead") return current;
-      const feedCount = current.feedCount + 1;
-      const energy = Math.min(ENERGY_MAX, current.energy + FEED_AMOUNT);
-      const memory: Memory = {
-        id: `feed-${feedCount}`,
-        text: `Fed +${FEED_AMOUNT} energy — new memory written.`,
-        blobId: makeBlobId(feedCount + 7),
-      };
-      return {
-        ...current,
-        energy,
-        feedCount,
-        memories: [memory, ...current.memories],
-      };
-    });
-  }
+  const feed = async () => {
+    const next = await postState("/api/feed");
+    if (next) setData(next);
+  };
 
-  function revive() {
-    setState(initialState());
-  }
+  const revive = async () => {
+    const next = await postState("/api/revive");
+    if (next) setData(next);
+  };
+
+  const energy = data?.energy ?? 100;
+  const energyMax = data?.energyMax ?? 100;
+  const status: WalStatus = data?.status ?? "alive";
 
   return {
-    energy: state.energy,
-    status: state.status,
-    memories: state.memories,
-    energyMax: ENERGY_MAX,
-    bodyBlobId: BODY_BLOB_ID,
-    mood: getMood(state.energy, state.status),
-    secondsLeft: state.energy / BURN_PER_SECOND,
+    energy,
+    energyMax,
+    status,
+    secondsLeft: data?.secondsLeft ?? 0,
+    bodyBlobId: data?.bodyBlobId ?? "—",
+    memories: data?.memories ?? [],
+    mood: getMood(energy, status),
+    loading: data === null,
     feed,
     revive,
   };
